@@ -11,7 +11,6 @@ Takımlar, oyuncular, ligler ve sezon istatistiklerini içermektedir.
 * Takım bilgileri
 * Oyuncu bilgileri
 * Sezon istatistikleri
-* Transfer verileri
 
 ---
 
