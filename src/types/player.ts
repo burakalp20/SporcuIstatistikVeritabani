@@ -8,6 +8,7 @@ export type Player = {
   id: number;
   name: string;
   surname: string;
+  position?: string;
   team: string;
   league: string;
   goals: number;

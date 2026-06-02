@@ -80,9 +80,14 @@ export default function PlayerScreen() {
           </Text>
         </View>
         <View style={styles.profileInfo}>
-          <Text style={styles.name}>
-            {player.name} {player.surname}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>
+              {player.name} {player.surname}
+            </Text>
+            {player.position ? (
+              <Text style={styles.positionBadge}>{player.position}</Text>
+            ) : null}
+          </View>
           <Text style={styles.team}>{player.team}</Text>
           <Text style={styles.league}>
             {player.league} | Sezon {player.season}
@@ -158,9 +163,24 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
+  },
   name: {
     color: "white",
     fontSize: 26,
+    fontWeight: "900",
+  },
+  positionBadge: {
+    color: "#0b2b4c",
+    backgroundColor: "#d8e6f2",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    fontSize: 12,
     fontWeight: "900",
   },
   team: {
