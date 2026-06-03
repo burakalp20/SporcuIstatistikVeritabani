@@ -32,7 +32,7 @@ Bir sporcunun tüm zamanları kapsayan genel kariyer verileri ile sadece belirli
 Çözüm olarak da veriler kullanım amacına göre ikiye bölünmüştür. Genel toplamları yansıtan temel veriler için Kulup_Kariyeri tablosu (toplam maç, gol, asist) oluşturulurken; sezona göre ayrıştırılmış detaylı veriler (sarı kart, kırmızı kart ve oynanan dakika gibi) için Sezon_Istatistik tablosu tasarlanarak esnek bir hale getirlmiştir
 
 Akış şeması
-![Akış Şeması](images/Akis_Semasi.png)
+![Akış Şeması](Images/Akis_Semasi.png)
 
 Yazılım Mimarisi
 Veritabanı için MSSQL kullanılmıştır. Burada sporculara ait bilgiler, sezon istatistikleri, kulüp kariyerleri, takım ve lig bilgileri ilişkisel tablolar halinde tutulmaktadır.
@@ -56,7 +56,7 @@ Veritabanı işlemleri tamamlandıktan sonra Node.js kullanılarak backend siste
 Son aşamada React Native ve Expo kullanılarak kullanıcı arayüzü geliştirilmiş, sporcu listeleme, detay görüntüleme ve sporcu karşılaştırma özellikleri sisteme eklenmiştir.
 
 Veri Tabanı Diyagramı
-![Veri Tabanı Diyagramı](images/ER_Diyagrami.png)
+![Veri Tabanı Diyagramı](Images/ER_Diyagrami.png)
 
 Genel Yapı
 
