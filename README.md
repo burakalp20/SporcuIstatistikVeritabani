@@ -1,6 +1,6 @@
   <h1 align="center">SPORCU İSTATİSTİK SİSTEMİ</h1> <p align="center"> MSSQL • Node.js • React Native • Expo </p> <p align="center"> <img src="https://img.shields.io/badge/MSSQL-Database-red"> <img src="https://img.shields.io/badge/Node.js-Backend-green"> <img src="https://img.shields.io/badge/React_Native-Frontend-blue"> <img src="https://img.shields.io/badge/Expo-Web_App-black"> </p>
 
-    <h2 align="center"> 📌 <span style="color:#4A90E2;">Problem Tanımı</span> </h2>
+<h2 align="center"> 📌 <span style="color:#4A90E2;">Problem Tanımı</span> </h2>
     Bu proje'nin amacı sporcuların sezon performanslarının, kariyer bilgilerinin ve istatistiklerinin düzenli, ilişkisel ve yönetilebilir şekilde saklanmasını amaçlayan bir Sporcu İstatistik Veritabanı Sistemi geliştirilmektir.
 
     Sistem içerisinde gol, asist, maç sayısı, kart istatistikleri, oynadığı takım ve lig bilgileri bulunmaktadır. Ayrıca sistemde iki farklı sporcunun istatistiklerini karşılaştırma özelliği de bulunmaktadır. Böylece sporcuların performanslarını analiz edebilmekte ve detaylı karşılaştırmalar yapabilmektedir.
@@ -73,7 +73,7 @@
     Frontend tarafında React Native ve Expo kullanılmıştır. Kullanıcılar uygulama üzerinden sporcuları listeleyebilmekte, oyuncu detaylarını görüntüleyebilmekte ve iki farklı sporcunun istatistiklerini karşılaştırabilmektedir.
 
     Proje geliştirme sürecinde ilişkisel veritabanı yönetimi, frontend-backend bağlantısı, veri modelleme ve mobil uygulama geliştirme konularında çalışmalar yapılmıştır.
-    
+
 
 <h2 align="center"> 📚 <span style="color:#34495E;">Referanslar</span> </h2>
 
