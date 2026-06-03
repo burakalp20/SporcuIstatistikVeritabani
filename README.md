@@ -80,8 +80,8 @@ Proje geliştirme sürecinde ilişkisel veritabanı yönetimi, frontend-backend 
 <h2 align="center">  <span style="color:#34495E;">Referanslar</span> </h2>
 
 
-    [1] Microsoft SQL Server Documentation (MSSQL kullanımı ve SQL yapıları)
-    https://learn.microsoft.com/sql/
+    [1] Microsoft SQL Server Dokümantasyonu (MSSQL kullanımı ve SQL yapıları)
+    https://learn.microsoft.com/tr-tr/
 
     [2] React Native Resmi Dokümantasyonu ve Öğretici YouTube Kanalı (Frontend geliştirme)
     https://reactnative.dev/
@@ -92,7 +92,7 @@ Proje geliştirme sürecinde ilişkisel veritabanı yönetimi, frontend-backend 
     https://www.youtube.com/@notjustdev 
 
     [4] Node.js Resmi Dokümantasyonu (Backend geliştirme)
-    https://nodejs.org/
+    https://nodejs.org/tr
 
     [5] W3Schools SQL Kaynakları (JOIN, VIEW ve SQL araştırmaları)
     https://www.w3schools.com/sql/
@@ -110,5 +110,6 @@ Proje geliştirme sürecinde ilişkisel veritabanı yönetimi, frontend-backend 
     https://chat.openai.com/
 
     [10] OpenAI Codex (Kod geliştirme ve hata analizi desteği)
-    https://openai.com/
+    https://openai.com/tr-TR/codex/
+
 
