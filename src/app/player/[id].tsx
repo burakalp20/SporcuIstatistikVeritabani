@@ -1,16 +1,26 @@
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-import { getPlayer } from "../../services/api";
+import { deletePlayer, getPlayer } from "../../services/api";
 import type { Player } from "../../types/player";
 
 export default function PlayerScreen() {
   // URL'deki /player/[id] parametresi hangi oyuncunun detayinin acilacagini belirler.
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
+  const router = useRouter();
   const [player, setPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,7 +39,7 @@ export default function PlayerScreen() {
       .catch(() => {
         if (active) {
           setPlayer(null);
-          setError("Oyuncu bulunamadi");
+          setError("Oyuncu bulunamadı");
         }
       })
       .finally(() => {
@@ -54,10 +64,28 @@ export default function PlayerScreen() {
     }
   }, [navigation, player]);
 
+  // Onay penceresinde "Sil" seçildiğinde oyuncuyu veritabanından kaldırır.
+  const confirmDelete = async () => {
+    setDeleting(true);
+    setError("");
+
+    try {
+      await deletePlayer(Number(id));
+      setConfirmVisible(false);
+      router.replace("/");
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error ? deleteError.message : "Oyuncu silinemedi",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.page}>
-        <Text style={styles.statusText}>Yukleniyor...</Text>
+        <Text style={styles.statusText}>Yükleniyor...</Text>
       </View>
     );
   }
@@ -65,7 +93,7 @@ export default function PlayerScreen() {
   if (!player) {
     return (
       <View style={styles.page}>
-        <Text style={styles.errorText}>{error || "Oyuncu bulunamadi"}</Text>
+        <Text style={styles.errorText}>{error || "Oyuncu bulunamadı"}</Text>
       </View>
     );
   }
@@ -93,42 +121,81 @@ export default function PlayerScreen() {
             {player.league} | Sezon {player.season}
           </Text>
         </View>
+        <Pressable
+          style={styles.deleteButton}
+          onPress={() => setConfirmVisible(true)}
+        >
+          <Text style={styles.deleteButtonText}>Oyuncuyu Sil</Text>
+        </Pressable>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Sezon Istatistikleri</Text>
-        <View style={styles.statsContainer}>
-          <StatBox label="Gol" value={player.goals} />
-          <StatBox label="Asist" value={player.assists} />
-          <StatBox label="Sari Kart" value={player.yellowCards} />
-          <StatBox label="Kirmizi Kart" value={player.redCards} />
-          <StatBox label="Dakika" value={player.minutes} />
-        </View>
-      </View>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      {player.clubCareer && (
+      <View style={styles.statsLayout}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Kulup Kariyeri</Text>
+          <Text style={styles.sectionTitle}>Sezon İstatistikleri</Text>
           <View style={styles.statsContainer}>
-            <StatBox label="Mac" value={player.clubCareer.matches} />
-            <StatBox label="Gol" value={player.clubCareer.goals} />
-            <StatBox label="Asist" value={player.clubCareer.assists} />
+            <StatBox label="Gol" value={player.goals} />
+            <StatBox label="Asist" value={player.assists} />
+            <StatBox label="Sarı Kart" value={player.yellowCards} />
+            <StatBox label="Kırmızı Kart" value={player.redCards} />
+            <StatBox label="Dakika" value={player.minutes} />
           </View>
         </View>
-      )}
+
+        {player.clubCareer && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Kulüp Kariyeri</Text>
+            <View style={styles.statsContainer}>
+              <StatBox label="Maç" value={player.clubCareer.matches} />
+              <StatBox label="Gol" value={player.clubCareer.goals} />
+              <StatBox label="Asist" value={player.clubCareer.assists} />
+            </View>
+          </View>
+        )}
+      </View>
+
+      <Modal transparent visible={confirmVisible} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>Oyuncuyu silmek istediğinizden emin misiniz?</Text>
+            <View style={styles.confirmActions}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={() => setConfirmVisible(false)}
+                disabled={deleting}
+              >
+                <Text style={styles.cancelButtonText}>İptal</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.confirmDeleteButton, deleting && styles.disabledButton]}
+                onPress={confirmDelete}
+                disabled={deleting}
+              >
+                <Text style={styles.confirmDeleteText}>
+                  {deleting ? "Siliniyor..." : "Sil"}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
 
+// Oyuncu profilindeki tek bir istatistik satırını etiket ve değer olarak gösterir.
 function StatBox({ label, value }: { label: string; value: number }) {
   return (
     <View style={styles.statBox}>
-      <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
+      <Text style={styles.statValue}>{value}</Text>
     </View>
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Oyuncu profil başlığını, istatistik kutularını ve oyuncu silme onay penceresini düzenler.
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -139,7 +206,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   profileHeader: {
-    backgroundColor: "#0b2b4c",
+    backgroundColor: "#14532d",
     borderRadius: 8,
     padding: 18,
     flexDirection: "row",
@@ -150,12 +217,12 @@ const styles = StyleSheet.create({
     width: 74,
     height: 74,
     borderRadius: 8,
-    backgroundColor: "#d8e6f2",
+    backgroundColor: "#dcfce7",
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
-    color: "#0b2b4c",
+    color: "#14532d",
     fontSize: 24,
     fontWeight: "900",
   },
@@ -175,8 +242,8 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   positionBadge: {
-    color: "#0b2b4c",
-    backgroundColor: "#d8e6f2",
+    color: "#14532d",
+    backgroundColor: "#bbf7d0",
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -184,57 +251,76 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   team: {
-    color: "#d8e6f2",
+    color: "#dcfce7",
     fontSize: 16,
     fontWeight: "800",
     marginTop: 4,
   },
   league: {
-    color: "#9fc2df",
-    fontSize: 13,
+    color: "#bbf7d0",
+    fontSize: 14,
     marginTop: 4,
   },
+  deleteButton: {
+    backgroundColor: "#d92d20",
+    borderRadius: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignSelf: "center",
+  },
+  deleteButtonText: {
+    color: "white",
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  statsLayout: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+  },
   section: {
+    flex: 1,
+    minWidth: 300,
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     padding: 16,
   },
   sectionTitle: {
-    color: "#12263a",
-    fontSize: 17,
+    color: "#143524",
+    fontSize: 18,
     fontWeight: "900",
     marginBottom: 12,
   },
   statsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
   },
   statBox: {
-    minWidth: 116,
-    flex: 1,
-    backgroundColor: "#eef3f8",
+    minHeight: 48,
+    backgroundColor: "#f0fdf4",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
-    padding: 14,
+    borderColor: "#d1fae5",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   statValue: {
-    color: "#0b5cab",
-    fontSize: 25,
+    color: "#15803d",
+    fontSize: 24,
     fontWeight: "900",
   },
   statLabel: {
-    color: "#66788a",
-    fontSize: 12,
+    color: "#5f6f64",
+    fontSize: 13,
     fontWeight: "800",
-    marginTop: 4,
     textTransform: "uppercase",
   },
   statusText: {
-    color: "#0b5cab",
+    color: "#15803d",
     fontWeight: "800",
     padding: 20,
   },
@@ -242,5 +328,58 @@ const styles = StyleSheet.create({
     color: "#b42318",
     fontWeight: "800",
     padding: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(7, 18, 33, 0.45)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  confirmBox: {
+    width: "100%",
+    maxWidth: 420,
+    backgroundColor: "white",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#d1fae5",
+    padding: 18,
+  },
+  confirmTitle: {
+    color: "#143524",
+    fontSize: 18,
+    fontWeight: "900",
+    marginBottom: 16,
+  },
+  confirmActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+  },
+  cancelButton: {
+    borderWidth: 1,
+    borderColor: "#d1fae5",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  cancelButtonText: {
+    color: "#143524",
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  confirmDeleteButton: {
+    backgroundColor: "#d92d20",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  confirmDeleteText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  disabledButton: {
+    opacity: 0.65,
   },
 });

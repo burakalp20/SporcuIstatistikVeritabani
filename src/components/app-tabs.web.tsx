@@ -23,7 +23,7 @@ export default function AppTabs() {
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
-            <TabButton>Istatistikler</TabButton>
+            <TabButton>İstatistikler</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
@@ -54,14 +54,14 @@ export function CustomTabList(props: TabListProps) {
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
         <ThemedText type="smallBold" style={styles.brandText}>
-          Sporcu Istatistik Sistemi
+          Sporcu İstatistik Sistemi
         </ThemedText>
 
         {props.children}
 
         <ExternalLink href="https://docs.expo.dev" asChild>
           <Pressable style={styles.externalPressable}>
-            <ThemedText type="link">Docs</ThemedText>
+            <ThemedText type="link">Dokümanlar</ThemedText>
             <SymbolView
               tintColor={colors.text}
               name={{ ios: 'arrow.up.right.square', web: 'link' }}
@@ -74,6 +74,8 @@ export function CustomTabList(props: TabListProps) {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Web sekme çubuğunun, marka yazısının ve dış bağlantı alanının görünümünü düzenler.
 const styles = StyleSheet.create({
   tabListContainer: {
     position: 'absolute',

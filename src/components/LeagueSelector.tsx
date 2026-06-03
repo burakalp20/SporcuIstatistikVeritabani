@@ -29,12 +29,14 @@ export default function LeagueSelector({ leagues, selected, onSelect }: Props) {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Lig seçim butonlarının boşluklarını, kenarlıklarını ve seçili lig rengini düzenler.
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     padding: 8,
     flexDirection: "row",
     gap: 8,
@@ -43,19 +45,19 @@ const styles = StyleSheet.create({
   item: {
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#d2dbe5",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: "#f7f9fb",
+    borderColor: "#d1fae5",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: "#f8fbf8",
   },
   selectedItem: {
-    backgroundColor: "#0b5cab",
-    borderColor: "#0b5cab",
+    backgroundColor: "#15803d",
+    borderColor: "#15803d",
   },
   text: {
-    color: "#24364a",
-    fontSize: 13,
-    fontWeight: "700",
+    color: "#1f3d2c",
+    fontSize: 14,
+    fontWeight: "800",
   },
   selectedText: {
     color: "white",

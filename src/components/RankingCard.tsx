@@ -31,6 +31,7 @@ export default function RankingCard({
     .sort((a, b) => Number(b[valueKey] ?? 0) - Number(a[valueKey] ?? 0))
     .slice(0, 5);
 
+  // Kart başlığına basıldığında ilgili krallığın detay sayfasını açar.
   const goToRanking = () => {
     // "Tumunu Gor" tiklandiginda secili lig query parametresiyle siralama sayfasina tasinir.
     router.push(`/ranking/${valueKey}?league=${selectedLeague || ""}`);
@@ -41,15 +42,15 @@ export default function RankingCard({
       <Pressable onPress={goToRanking} style={styles.header}>
         <View>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>Ilk 5 oyuncu</Text>
+          <Text style={styles.subtitle}>İlk 5 oyuncu</Text>
         </View>
-        <Text style={styles.linkText}>Tumunu Gor</Text>
+        <Text style={styles.linkText}>Tümünü gör</Text>
       </Pressable>
 
       <View style={styles.tableHeader}>
         <Text style={[styles.headerCell, styles.rankCell]}>#</Text>
         <Text style={[styles.headerCell, styles.playerCell]}>Oyuncu</Text>
-        <Text style={[styles.headerCell, styles.valueCell]}>Deger</Text>
+        <Text style={[styles.headerCell, styles.valueCell]}>Değer</Text>
       </View>
 
       <View style={styles.list}>
@@ -72,6 +73,8 @@ export default function RankingCard({
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Ana sayfadaki krallık kartlarının başlığını, tablo satırlarını ve değer kolonunu düzenler.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -79,12 +82,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     overflow: "hidden",
   },
   header: {
-    minHeight: 58,
-    backgroundColor: "#123f6d",
+    minHeight: 64,
+    backgroundColor: "#166534",
     paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: "row",
@@ -94,50 +97,50 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "800",
+    fontSize: 18,
+    fontWeight: "900",
   },
   subtitle: {
-    color: "#bdd5e9",
-    fontSize: 12,
+    color: "#bbf7d0",
+    fontSize: 13,
     marginTop: 2,
   },
   linkText: {
     color: "white",
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: 13,
+    fontWeight: "900",
   },
   tableHeader: {
-    height: 34,
+    height: 40,
     paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#eef3f8",
+    backgroundColor: "#f0fdf4",
     borderBottomWidth: 1,
-    borderBottomColor: "#d9e1ea",
+    borderBottomColor: "#d1fae5",
   },
   headerCell: {
-    color: "#617184",
-    fontSize: 11,
-    fontWeight: "800",
+    color: "#4f6356",
+    fontSize: 13,
+    fontWeight: "900",
     textTransform: "uppercase",
   },
   list: {
     // Sabit yukseklik, lig degisimlerinde satirlarin baslik ustune tasmasini engeller.
-    minHeight: 264,
+    height: 280,
     overflow: "hidden",
   },
   row: {
-    height: 52,
+    height: 56,
     paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#edf1f5",
+    borderBottomColor: "#e5f3ea",
   },
   rowText: {
-    color: "#24364a",
-    fontSize: 14,
+    color: "#1f3d2c",
+    fontSize: 15,
     fontWeight: "800",
   },
   rankCell: {
@@ -152,18 +155,18 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   playerName: {
-    color: "#12263a",
-    fontSize: 14,
-    fontWeight: "700",
+    color: "#143524",
+    fontSize: 15,
+    fontWeight: "800",
   },
   teamName: {
-    color: "#66788a",
-    fontSize: 12,
+    color: "#5f6f64",
+    fontSize: 13,
     marginTop: 2,
   },
   valueText: {
-    color: "#0b5cab",
-    fontSize: 16,
+    color: "#15803d",
+    fontSize: 18,
     fontWeight: "900",
   },
 });

@@ -30,7 +30,7 @@ export default function TeamScreen() {
       })
       .catch(() => {
         if (active) {
-          setError("Takim yuklenemedi");
+          setError("Takım yüklenemedi");
         }
       })
       .finally(() => {
@@ -60,7 +60,7 @@ export default function TeamScreen() {
   if (loading) {
     return (
       <View style={styles.page}>
-        <Text style={styles.statusText}>Yukleniyor...</Text>
+        <Text style={styles.statusText}>Yükleniyor...</Text>
       </View>
     );
   }
@@ -69,7 +69,7 @@ export default function TeamScreen() {
     return (
       <View style={styles.page}>
         <Text style={styles.errorText}>
-          {error || `Takim bulunamadi: ${teamName}`}
+          {error || `Takım bulunamadı: ${teamName}`}
         </Text>
       </View>
     );
@@ -78,7 +78,7 @@ export default function TeamScreen() {
   return (
     <View style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>Takim kadrosu</Text>
+        <Text style={styles.eyebrow}>Takım kadrosu</Text>
         <Text style={styles.teamName}>{teamName}</Text>
         <Text style={styles.playerCount}>{teamPlayers.length} oyuncu</Text>
       </View>
@@ -88,11 +88,12 @@ export default function TeamScreen() {
           <Text style={[styles.headerCell, styles.playerCell]}>Oyuncu</Text>
           <Text style={[styles.headerCell, styles.statCell]}>Gol</Text>
           <Text style={[styles.headerCell, styles.statCell]}>Asist</Text>
-          <Text style={[styles.headerCell, styles.statCell]}>Sari</Text>
-          <Text style={[styles.headerCell, styles.statCell]}>Kirmizi</Text>
+          <Text style={[styles.headerCell, styles.statCell]}>Sarı</Text>
+          <Text style={[styles.headerCell, styles.statCell]}>Kırmızı</Text>
         </View>
 
         <FlatList
+          style={styles.playersList}
           data={teamPlayers}
           // rowKey SQL istatistik satirini da icerir; ayni oyuncu id'si tekrar etse bile liste bozulmaz.
           keyExtractor={(item, index) =>
@@ -128,6 +129,8 @@ export default function TeamScreen() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Takım kadrosu sayfasındaki üst bilgi alanını, oyuncu listesini ve istatistik kolonlarını düzenler.
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -135,14 +138,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    backgroundColor: "#0b2b4c",
+    backgroundColor: "#14532d",
     borderRadius: 8,
     padding: 18,
     marginBottom: 14,
   },
   eyebrow: {
-    color: "#9fc2df",
-    fontSize: 12,
+    color: "#bbf7d0",
+    fontSize: 13,
     fontWeight: "800",
     textTransform: "uppercase",
     marginBottom: 4,
@@ -153,67 +156,72 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   playerCount: {
-    color: "#d8e6f2",
-    fontSize: 13,
+    color: "#dcfce7",
+    fontSize: 14,
     marginTop: 6,
     fontWeight: "700",
   },
   table: {
+    flex: 1,
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     overflow: "hidden",
   },
   tableHeader: {
-    height: 38,
+    height: 44,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#eef3f8",
+    backgroundColor: "#f0fdf4",
     borderBottomWidth: 1,
-    borderBottomColor: "#d9e1ea",
+    borderBottomColor: "#d1fae5",
+  },
+  playersList: {
+    flex: 1,
   },
   headerCell: {
-    color: "#617184",
-    fontSize: 11,
+    color: "#4f6356",
+    fontSize: 13,
     fontWeight: "900",
     textTransform: "uppercase",
   },
   row: {
-    minHeight: 58,
+    minHeight: 64,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#edf1f5",
+    borderBottomColor: "#e5f3ea",
   },
   playerCell: {
-    flex: 1,
+    width: 360,
     minWidth: 0,
+    marginRight: 20,
   },
   statCell: {
     width: 58,
     textAlign: "right",
   },
   playerName: {
-    color: "#12263a",
-    fontSize: 15,
+    color: "#143524",
+    fontSize: 16,
     fontWeight: "800",
   },
   leagueName: {
-    color: "#66788a",
-    fontSize: 12,
+    color: "#5f6f64",
+    fontSize: 13,
     marginTop: 3,
     fontWeight: "700",
   },
   statText: {
-    color: "#0b5cab",
-    fontSize: 15,
+    color: "#15803d",
+    fontSize: 17,
     fontWeight: "900",
   },
   statusText: {
-    color: "#0b5cab",
+    color: "#15803d",
     fontWeight: "800",
   },
   errorText: {

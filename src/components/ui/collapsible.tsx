@@ -40,6 +40,8 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Açılır/kapanır bölümün başlık satırını, içerik boşluğunu ve ikon hizasını düzenler.
 const styles = StyleSheet.create({
   heading: {
     flexDirection: 'row',

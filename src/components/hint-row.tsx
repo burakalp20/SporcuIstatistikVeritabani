@@ -22,6 +22,8 @@ export function HintRow({ title = 'Try editing', hint = 'app/index.tsx' }: HintR
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Küçük bilgilendirme satırlarının ikon, metin ve hizalama görünümünü düzenler.
 const styles = StyleSheet.create({
   stepRow: {
     flexDirection: 'row',

@@ -27,6 +27,8 @@ export function WebBadge() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Web rozetinin kenarlık, arka plan, metin ve konum görünümünü düzenler.
 const styles = StyleSheet.create({
   container: {
     padding: Spacing.five,

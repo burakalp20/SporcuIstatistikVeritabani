@@ -30,6 +30,8 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Ortak metin tiplerinin punto, kalınlık ve bağlantı rengini düzenler.
 const styles = StyleSheet.create({
   small: {
     fontSize: 14,
@@ -63,7 +65,7 @@ const styles = StyleSheet.create({
   linkPrimary: {
     lineHeight: 30,
     fontSize: 14,
-    color: '#3c87f7',
+    color: '#15803d',
   },
   code: {
     fontFamily: Fonts.mono,

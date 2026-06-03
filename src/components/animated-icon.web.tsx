@@ -72,6 +72,8 @@ export function AnimatedIcon() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Web tarafındaki animasyonlu ikonun renk, boyut ve geçiş görünümünü düzenler.
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',

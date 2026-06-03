@@ -5,6 +5,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { getRanking } from "../../services/api";
 import type { Player, RankingKey } from "../../types/player";
 
+// URL'den gelen krallık değerini uygulamanın kullandığı sıralama anahtarına çevirir.
 function normalizeRankingType(type: string | string[] | undefined): RankingKey {
   const value = Array.isArray(type) ? type[0] : type;
   const normalized = String(value || "").toLowerCase();
@@ -57,7 +58,7 @@ export default function RankingScreen() {
       })
       .catch(() => {
         if (active) {
-          setError("Siralama yuklenemedi");
+          setError("Sıralama yüklenemedi");
         }
       })
       .finally(() => {
@@ -78,8 +79,8 @@ export default function RankingScreen() {
       : rankingType === "assists"
         ? "Asist"
         : rankingType === "yellowCards"
-          ? "Sari Kart"
-          : "Kirmizi Kart";
+          ? "Sarı Kart"
+          : "Kırmızı Kart";
 
   const goToPlayer = (playerId: number) => {
     // Siralama satirindaki oyuncuya tiklayinca oyuncu detay ekranina gidilir.
@@ -90,22 +91,23 @@ export default function RankingScreen() {
     <View style={styles.page}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>{leagueTitle || "Genel"}</Text>
-        <Text style={styles.title}>{rankingTitle} Kralligi</Text>
-        <Text style={styles.subtitle}>Ilk 10 oyuncu siralamasi</Text>
+        <Text style={styles.title}>{rankingTitle} Krallığı</Text>
+        <Text style={styles.subtitle}>İlk 10 oyuncu sıralaması</Text>
       </View>
 
-      {loading && <Text style={styles.statusText}>Yukleniyor...</Text>}
+      {loading && <Text style={styles.statusText}>Yükleniyor...</Text>}
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={[styles.headerCell, styles.rankCell]}>#</Text>
           <Text style={[styles.headerCell, styles.playerCell]}>Oyuncu</Text>
-          <Text style={[styles.headerCell, styles.teamCell]}>Takim</Text>
-          <Text style={[styles.headerCell, styles.valueCell]}>Deger</Text>
+          <Text style={[styles.headerCell, styles.teamCell]}>Takım</Text>
+          <Text style={[styles.headerCell, styles.valueCell]}>Değer</Text>
         </View>
 
         <FlatList
+          style={styles.rankingList}
           data={players.slice(0, 10)}
           // Ayni oyuncunun birden fazla satiri olabilecegi icin id yerine rowKey tercih edilir.
           keyExtractor={(item, index) =>
@@ -135,6 +137,8 @@ export default function RankingScreen() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Krallık top 10 sayfalarının başlık alanını, kompakt tablo kolonlarını ve kaydırılabilir listeyi düzenler.
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -142,14 +146,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    backgroundColor: "#0b2b4c",
+    backgroundColor: "#14532d",
     borderRadius: 8,
     padding: 18,
     marginBottom: 14,
   },
   eyebrow: {
-    color: "#9fc2df",
-    fontSize: 12,
+    color: "#bbf7d0",
+    fontSize: 13,
     fontWeight: "800",
     textTransform: "uppercase",
     marginBottom: 4,
@@ -160,12 +164,12 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   subtitle: {
-    color: "#d8e6f2",
-    fontSize: 13,
+    color: "#dcfce7",
+    fontSize: 14,
     marginTop: 6,
   },
   statusText: {
-    color: "#0b5cab",
+    color: "#15803d",
     fontWeight: "800",
     marginBottom: 10,
   },
@@ -175,68 +179,75 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   table: {
+    flex: 1,
+    alignSelf: "flex-start",
+    width: "100%",
+    maxWidth: 760,
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     overflow: "hidden",
   },
   tableHeader: {
-    height: 38,
+    height: 44,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#eef3f8",
+    backgroundColor: "#f0fdf4",
     borderBottomWidth: 1,
-    borderBottomColor: "#d9e1ea",
+    borderBottomColor: "#d1fae5",
+  },
+  rankingList: {
+    flex: 1,
   },
   headerCell: {
-    color: "#617184",
-    fontSize: 11,
+    color: "#4f6356",
+    fontSize: 13,
     fontWeight: "900",
     textTransform: "uppercase",
   },
   row: {
-    minHeight: 54,
+    minHeight: 60,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#edf1f5",
+    borderBottomColor: "#e5f3ea",
   },
   rankCell: {
-    width: 34,
+    width: 38,
   },
   playerCell: {
-    flex: 1.25,
+    width: 310,
     minWidth: 0,
   },
   teamCell: {
-    flex: 1,
+    width: 220,
     minWidth: 0,
   },
   valueCell: {
-    width: 58,
+    width: 72,
     textAlign: "right",
   },
   rankText: {
-    color: "#0b5cab",
-    fontSize: 15,
+    color: "#15803d",
+    fontSize: 17,
     fontWeight: "900",
   },
   playerName: {
-    color: "#12263a",
-    fontSize: 15,
+    color: "#143524",
+    fontSize: 16,
     fontWeight: "800",
   },
   teamName: {
-    color: "#66788a",
-    fontSize: 13,
+    color: "#5f6f64",
+    fontSize: 14,
     fontWeight: "700",
   },
   valueText: {
-    color: "#0b5cab",
-    fontSize: 17,
+    color: "#15803d",
+    fontSize: 19,
     fontWeight: "900",
   },
 });

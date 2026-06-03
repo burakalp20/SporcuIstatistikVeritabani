@@ -110,6 +110,120 @@ const rankingColumns = {
   redCards: "si.kart_kirmizi",
 };
 
+// Gelen metin değerlerini boşluklardan arındırıp güvenli string formatına çevirir.
+function cleanText(value) {
+  return String(value || "").trim();
+}
+
+// Arama yaparken Türkçe karakter farklarını azaltmak için metni sadeleştirir.
+function normalizeSearchText(value) {
+  return cleanText(value)
+    .toLocaleLowerCase("tr-TR")
+    .replace(/ç/g, "c")
+    .replace(/ğ/g, "g")
+    .replace(/ı/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ş/g, "s")
+    .replace(/ü/g, "u");
+}
+
+// SQL tarafında da Türkçe karakterleri sadeleştirerek LIKE aramasını güçlendirir.
+function normalizedSql(column) {
+  return `
+    LOWER(
+      REPLACE(
+        REPLACE(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                REPLACE(
+                  REPLACE(
+                    REPLACE(
+                      REPLACE(
+                        REPLACE(
+                          REPLACE(
+                            REPLACE(${column}, N'Ç', N'C'),
+                          N'ç', N'c'),
+                        N'Ğ', N'G'),
+                      N'ğ', N'g'),
+                    N'İ', N'I'),
+                  N'ı', N'i'),
+                N'Ö', N'O'),
+              N'ö', N'o'),
+            N'Ş', N'S'),
+          N'ş', N's'),
+        N'Ü', N'U'),
+      N'ü', N'u')
+    )
+  `;
+}
+
+// Boş bırakılabilen sayı alanlarını null veya negatif olmayan tam sayıya çevirir.
+function toOptionalInt(value) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.trunc(number)) : 0;
+}
+
+// Zorunlu sayı alanlarında boş değer gelirse varsayılan olarak 0 kullanır.
+function toRequiredInt(value) {
+  return toOptionalInt(value) ?? 0;
+}
+
+// Oyuncu eklenirken lig varsa mevcut id'yi döndürür, yoksa yeni lig kaydı oluşturur.
+async function findOrCreateLeague(transaction, leagueName, country) {
+  const leagueResult = await transaction
+    .request()
+    .input("leagueName", sql.NVarChar, leagueName)
+    .query("SELECT id FROM dbo.Lig WHERE ad = @leagueName");
+
+  if (leagueResult.recordset[0]) {
+    return leagueResult.recordset[0].id;
+  }
+
+  const insertResult = await transaction
+    .request()
+    .input("leagueName", sql.NVarChar, leagueName)
+    .input("country", sql.NVarChar, country)
+    .query(`
+      INSERT INTO dbo.Lig (ad, ulke)
+      OUTPUT INSERTED.id
+      VALUES (@leagueName, @country)
+    `);
+
+  return insertResult.recordset[0].id;
+}
+
+// Oyuncu eklenirken takım varsa mevcut id'yi döndürür, yoksa yeni takım kaydı oluşturur.
+async function findOrCreateTeam(transaction, teamName, city, foundedYear, leagueId) {
+  const teamResult = await transaction
+    .request()
+    .input("teamName", sql.NVarChar, teamName)
+    .query("SELECT id FROM dbo.Takim WHERE ad = @teamName");
+
+  if (teamResult.recordset[0]) {
+    return teamResult.recordset[0].id;
+  }
+
+  const insertResult = await transaction
+    .request()
+    .input("teamName", sql.NVarChar, teamName)
+    .input("city", sql.NVarChar, city)
+    .input("foundedYear", sql.Int, foundedYear)
+    .input("leagueId", sql.Int, leagueId)
+    .query(`
+      INSERT INTO dbo.Takim (ad, sehir, kurulus_yili, lig_id)
+      OUTPUT INSERTED.id
+      VALUES (@teamName, @city, @foundedYear, @leagueId)
+    `);
+
+  return insertResult.recordset[0].id;
+}
+
+// Backend ve SQL Server bağlantısının çalışıp çalışmadığını kontrol eder.
 app.get("/health", async (_req, res) => {
   try {
     const pool = await getPool();
@@ -120,6 +234,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 
+// Ana sayfadaki lig butonları için tüm lig adlarını getirir.
 app.get("/leagues", async (_req, res) => {
   try {
     const pool = await getPool();
@@ -133,6 +248,85 @@ app.get("/leagues", async (_req, res) => {
   }
 });
 
+// Yeni oyuncu formundaki lig arama alanı için lig seçeneklerini getirir.
+app.get("/league-options", async (req, res) => {
+  try {
+    const query = cleanText(req.query.q);
+    const normalizedQuery = normalizeSearchText(query);
+    const pool = await getPool();
+    const request = pool.request();
+    const where = [];
+
+    if (query) {
+      request.input("query", sql.NVarChar, `%${query}%`);
+      request.input("normalizedQuery", sql.NVarChar, `%${normalizedQuery}%`);
+      where.push(`
+        ad LIKE @query
+        OR ulke LIKE @query
+        OR ${normalizedSql("ad")} LIKE @normalizedQuery
+        OR ${normalizedSql("ulke")} LIKE @normalizedQuery
+      `);
+    }
+
+    const result = await request.query(`
+      SELECT TOP 8
+        id,
+        ad AS name,
+        ulke AS country
+      FROM dbo.Lig
+      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+      ORDER BY ad ASC
+    `);
+
+    res.json(result.recordset);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Yeni oyuncu formundaki takım arama alanı için takım ve bağlı lig bilgilerini getirir.
+app.get("/team-options", async (req, res) => {
+  try {
+    const query = cleanText(req.query.q);
+    const normalizedQuery = normalizeSearchText(query);
+    const pool = await getPool();
+    const request = pool.request();
+    const where = [];
+
+    if (query) {
+      request.input("query", sql.NVarChar, `%${query}%`);
+      request.input("normalizedQuery", sql.NVarChar, `%${normalizedQuery}%`);
+      where.push(`
+        t.ad LIKE @query
+        OR t.sehir LIKE @query
+        OR l.ad LIKE @query
+        OR ${normalizedSql("t.ad")} LIKE @normalizedQuery
+        OR ${normalizedSql("t.sehir")} LIKE @normalizedQuery
+        OR ${normalizedSql("l.ad")} LIKE @normalizedQuery
+      `);
+    }
+
+    const result = await request.query(`
+      SELECT TOP 8
+        t.id,
+        t.ad AS name,
+        t.sehir AS city,
+        t.kurulus_yili AS foundedYear,
+        l.ad AS league,
+        l.ulke AS leagueCountry
+      FROM dbo.Takim t
+      INNER JOIN dbo.Lig l ON t.lig_id = l.id
+      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+      ORDER BY t.ad ASC
+    `);
+
+    res.json(result.recordset);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Ana sayfa ve lig seçimi için oyuncuları isteğe bağlı lig filtresiyle getirir.
 app.get("/players", async (req, res) => {
   try {
     const pool = await getPool();
@@ -157,6 +351,7 @@ app.get("/players", async (req, res) => {
   }
 });
 
+// Oyuncu profil sayfası için tek bir oyuncunun detay kaydını getirir.
 app.get("/players/:id", async (req, res) => {
   try {
     const pool = await getPool();
@@ -168,7 +363,7 @@ app.get("/players/:id", async (req, res) => {
     const player = result.recordset[0];
 
     if (!player) {
-      res.status(404).json({ error: "Oyuncu bulunamadi" });
+      res.status(404).json({ error: "Oyuncu bulunamadı" });
       return;
     }
 
@@ -178,6 +373,157 @@ app.get("/players/:id", async (req, res) => {
   }
 });
 
+// Yeni oyuncu formundan gelen verilerle oyuncu, sezon istatistiği ve kulüp kariyeri kaydı oluşturur.
+app.post("/players", async (req, res) => {
+  const body = req.body || {};
+  const name = cleanText(body.name);
+  const surname = cleanText(body.surname);
+  const birthDate = cleanText(body.birthDate);
+  const nationality = cleanText(body.nationality);
+  const position = cleanText(body.position);
+  const league = cleanText(body.league);
+  const leagueCountry = cleanText(body.leagueCountry) || "Belirtilmedi";
+  const team = cleanText(body.team);
+  const teamCity = cleanText(body.teamCity) || "Belirtilmedi";
+  const season = cleanText(body.season);
+
+  if (!name || !surname || !birthDate || !nationality || !position || !league || !team || !season) {
+    res.status(400).json({ error: "Zorunlu oyuncu alanları eksik" });
+    return;
+  }
+
+  const pool = await getPool();
+  const transaction = new sql.Transaction(pool);
+
+  try {
+    await transaction.begin();
+
+    const leagueId = await findOrCreateLeague(transaction, league, leagueCountry);
+    const teamId = await findOrCreateTeam(
+      transaction,
+      team,
+      teamCity,
+      toOptionalInt(body.teamFoundedYear),
+      leagueId,
+    );
+
+    const playerResult = await transaction
+      .request()
+      .input("name", sql.NVarChar, name)
+      .input("surname", sql.NVarChar, surname)
+      .input("birthDate", sql.Date, birthDate)
+      .input("nationality", sql.NVarChar, nationality)
+      .input("position", sql.NVarChar, position)
+      .input("teamId", sql.Int, teamId)
+      .query(`
+        INSERT INTO dbo.Oyuncu (ad, soyad, dogum_tarihi, uyruk, pozisyon, takim_id)
+        OUTPUT INSERTED.id
+        VALUES (@name, @surname, @birthDate, @nationality, @position, @teamId)
+      `);
+
+    const playerId = playerResult.recordset[0].id;
+
+    await transaction
+      .request()
+      .input("season", sql.VarChar, season)
+      .input("playerId", sql.Int, playerId)
+      .input("teamId", sql.Int, teamId)
+      .input("leagueId", sql.Int, leagueId)
+      .input("matches", sql.Int, toRequiredInt(body.matches))
+      .input("goals", sql.Int, toRequiredInt(body.goals))
+      .input("assists", sql.Int, toRequiredInt(body.assists))
+      .input("yellowCards", sql.Int, toRequiredInt(body.yellowCards))
+      .input("redCards", sql.Int, toRequiredInt(body.redCards))
+      .input("minutes", sql.Int, toRequiredInt(body.minutes))
+      .query(`
+        INSERT INTO dbo.Sezon_Istatistik
+          (sezon, oyuncu_id, takim_id, lig_id, mac_sayisi, gol, asist, kart_sari, kart_kirmizi, dakika)
+        VALUES
+          (@season, @playerId, @teamId, @leagueId, @matches, @goals, @assists, @yellowCards, @redCards, @minutes)
+      `);
+
+    await transaction
+      .request()
+      .input("playerId", sql.Int, playerId)
+      .input("teamId", sql.Int, teamId)
+      .input("careerMatches", sql.Int, toRequiredInt(body.careerMatches))
+      .input("careerGoals", sql.Int, toRequiredInt(body.careerGoals))
+      .input("careerAssists", sql.Int, toRequiredInt(body.careerAssists))
+      .query(`
+        INSERT INTO dbo.Kulup_Kariyeri (oyuncu_id, takim_id, mac_sayisi, gol, asist)
+        VALUES (@playerId, @teamId, @careerMatches, @careerGoals, @careerAssists)
+      `);
+
+    await transaction.commit();
+
+    res.status(201).json({ id: playerId });
+  } catch (error) {
+    try {
+      await transaction.rollback();
+    } catch {
+      // Rollback hatasi ana hatayi golgelemesin.
+    }
+
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Oyuncuyu bağlı istatistik ve kariyer kayıtlarıyla birlikte veritabanından tamamen siler.
+app.delete("/players/:id", async (req, res) => {
+  const playerId = Number(req.params.id);
+
+  if (!Number.isInteger(playerId) || playerId <= 0) {
+    res.status(400).json({ error: "Geçersiz oyuncu id" });
+    return;
+  }
+
+  const pool = await getPool();
+  const transaction = new sql.Transaction(pool);
+
+  try {
+    await transaction.begin();
+
+    const playerResult = await transaction
+      .request()
+      .input("playerId", sql.Int, playerId)
+      .query("SELECT id FROM dbo.Oyuncu WHERE id = @playerId");
+
+    if (!playerResult.recordset[0]) {
+      await transaction.rollback();
+      res.status(404).json({ error: "Oyuncu bulunamadı" });
+      return;
+    }
+
+    await transaction
+      .request()
+      .input("playerId", sql.Int, playerId)
+      .query("DELETE FROM dbo.Kulup_Kariyeri WHERE oyuncu_id = @playerId");
+
+    await transaction
+      .request()
+      .input("playerId", sql.Int, playerId)
+      .query("DELETE FROM dbo.Sezon_Istatistik WHERE oyuncu_id = @playerId");
+
+    await transaction
+      .request()
+      .input("playerId", sql.Int, playerId)
+      .query("DELETE FROM dbo.Oyuncu WHERE id = @playerId");
+
+    await transaction.commit();
+
+    res.json({ ok: true });
+  } catch (error) {
+    try {
+      await transaction.rollback();
+    } catch {
+      // Rollback hatasi ana hatayi golgelemesin.
+    }
+
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Takım kadrosu sayfası için seçilen takımın oyuncularını listeler.
 app.get("/teams/:name", async (req, res) => {
   try {
     const pool = await getPool();
@@ -192,12 +538,13 @@ app.get("/teams/:name", async (req, res) => {
   }
 });
 
+// Gol, asist, sarı kart ve kırmızı kart krallıkları için sıralı oyuncu listesini getirir.
 app.get("/rankings/:type", async (req, res) => {
   try {
     const rankingColumn = rankingColumns[req.params.type];
 
     if (!rankingColumn) {
-      res.status(400).json({ error: "Gecersiz siralama tipi" });
+      res.status(400).json({ error: "Geçersiz sıralama tipi" });
       return;
     }
 
@@ -222,6 +569,7 @@ app.get("/rankings/:type", async (req, res) => {
   }
 });
 
+// Genel arama çubuğu için oyuncu ve takım sonuçlarını birlikte arar.
 app.get("/search", async (req, res) => {
   try {
     const query = String(req.query.q || "").trim();
@@ -239,7 +587,12 @@ app.get("/search", async (req, res) => {
       .request()
       .input("query", sql.NVarChar, likeQuery)
       .query(`
-        SELECT TOP 5 o.id, o.ad AS name, o.soyad AS surname, t.ad AS team
+        SELECT TOP 5
+          o.id,
+          o.ad AS name,
+          o.soyad AS surname,
+          o.pozisyon AS position,
+          t.ad AS team
         FROM dbo.Oyuncu o
         INNER JOIN dbo.Takim t ON o.takim_id = t.id
         WHERE CONCAT(o.ad, ' ', o.soyad) LIKE @query
@@ -268,5 +621,5 @@ app.get("/search", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Sporcu API http://localhost:${port} adresinde calisiyor`);
+  console.log(`Sporcu API http://localhost:${port} adresinde çalışıyor`);
 });

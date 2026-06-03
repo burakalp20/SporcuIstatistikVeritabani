@@ -1,4 +1,12 @@
-import type { Player, RankingKey, SearchResult } from "../types/player";
+import type {
+  LeagueOption,
+  NewPlayerInput,
+  Player,
+  PlayerSearchResult,
+  RankingKey,
+  SearchResult,
+  TeamOption,
+} from "../types/player";
 
 // Expo uygulamasi tum veriyi Node.js backendinden alir.
 // Telefonda test ederken bu adres .env ile bilgisayarin yerel IP'sine cevrilebilir.
@@ -22,7 +30,7 @@ async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`API hatasi: ${response.status}`);
+    throw new Error(`API hatası: ${response.status}`);
   }
 
   return response.json();
@@ -32,28 +40,76 @@ export function getLeagues() {
   return fetchJson<string[]>(buildUrl("/leagues"));
 }
 
+// Yeni oyuncu formundaki lig araması için SQL'deki lig kayıtlarını getirir.
+export function searchLeagueOptions(query: string) {
+  return fetchJson<LeagueOption[]>(buildUrl("/league-options", { q: query }));
+}
+
+// Yeni oyuncu formundaki takım araması için SQL'deki takım kayıtlarını getirir.
+export function searchTeamOptions(query: string) {
+  return fetchJson<TeamOption[]>(buildUrl("/team-options", { q: query }));
+}
+
+// Ana sayfada seçilen lige göre oyuncu istatistiklerini listeler.
 export function getPlayers(league?: string) {
   return fetchJson<Player[]>(buildUrl("/players", { league }));
 }
 
+// Oyuncu profil sayfası için tek bir oyuncunun detay bilgisini getirir.
 export function getPlayer(id: number) {
   return fetchJson<Player>(buildUrl(`/players/${id}`));
 }
 
+// Takım sayfasında gösterilecek kadro listesini takım adına göre getirir.
 export function getTeamPlayers(teamName: string) {
   return fetchJson<Player[]>(buildUrl(`/teams/${encodeURIComponent(teamName)}`));
 }
 
+// Krallık sayfaları için gol, asist veya kart sıralamasını getirir.
 export function getRanking(type: RankingKey, league?: string) {
   return fetchJson<Player[]>(buildUrl(`/rankings/${type}`, { league }));
 }
 
+// Yeni oyuncu ekleme formundaki bilgileri backend'e gönderip SQL'e kaydeder.
+export async function createPlayer(player: NewPlayerInput) {
+  const response = await fetch(buildUrl("/players"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(player),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.error || `API hatası: ${response.status}`);
+  }
+
+  return response.json() as Promise<{ id: number }>;
+}
+
+// Oyuncu profilindeki silme işlemini backend'e bildirir.
+export async function deletePlayer(id: number) {
+  const response = await fetch(buildUrl(`/players/${id}`), {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.error || `API hatası: ${response.status}`);
+  }
+
+  return response.json() as Promise<{ ok: boolean }>;
+}
+
+// Genel arama çubuğu için oyuncu ve takım sonuçlarını tek listede toplar.
 export async function searchPlayersAndTeams(query: string) {
   const result = await fetchJson<{
     players: Array<{
       id: number;
       name: string;
       surname: string;
+      position?: string;
       team: string;
     }>;
     teams: string[];
@@ -74,4 +130,13 @@ export async function searchPlayersAndTeams(query: string) {
       type: "team",
     })),
   ];
+}
+
+// Oyuncu karşılaştırma paneli sadece oyuncu seçebildiği için takım sonuçlarını filtreler.
+export async function searchPlayers(query: string): Promise<PlayerSearchResult[]> {
+  const results = await searchPlayersAndTeams(query);
+
+  return results.filter(
+    (result): result is PlayerSearchResult => result.type === "player",
+  );
 }

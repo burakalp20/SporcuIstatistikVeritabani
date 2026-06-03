@@ -19,6 +19,7 @@ export default function SearchBar() {
   const searchId = useRef(0);
   const router = useRouter();
 
+  // Kullanıcı yazdıkça backend'den oyuncu ve takım önerilerini alır.
   const handleSearch = async (text: string) => {
     setQuery(text);
     searchId.current += 1;
@@ -43,26 +44,28 @@ export default function SearchBar() {
     }
   };
 
+  // Seçilen arama sonucunun tipine göre oyuncu profiline veya takım sayfasına yönlendirir.
   const selectItem = (item: SearchResult) => {
     setQuery("");
     setSuggestions([]);
 
+    // Oyuncu secilirse profil sayfasina, takim secilirse takim kadrosuna gidilir.
     if (item.type === "player") {
-      // Oyuncu sonucu detay ekranina, takim sonucu takim ekranina yonlendirilir.
       router.push(`/player/${item.id}` as any);
-    } else {
-      router.push(`/team/${encodeURIComponent(item.name)}` as any);
+      return;
     }
+
+    router.push(`/team/${encodeURIComponent(item.team)}` as any);
   };
 
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Oyuncu veya takim ara"
+        placeholder="Oyuncu veya takım ara"
         value={query}
         onChangeText={handleSearch}
-        placeholderTextColor="#7f91a5"
+        placeholderTextColor="#6b7d70"
         autoCapitalize="none"
         autoCorrect={false}
       />
@@ -79,12 +82,12 @@ export default function SearchBar() {
               >
                 <View style={styles.suggestionContent}>
                   <Text style={styles.suggestionText}>
-                    {item.type === "player"
-                      ? `${item.name} ${item.surname}`
-                      : item.name}
+                    {item.name} {item.surname}
                   </Text>
                   <Text style={styles.suggestionSubtext}>
-                    {item.type === "player" ? item.team : "Takim"}
+                    {item.type === "team"
+                      ? "Takım"
+                      : `${item.position ? `${item.position} | ` : ""}${item.team}`}
                   </Text>
                 </View>
               </Pressable>
@@ -96,6 +99,8 @@ export default function SearchBar() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Genel oyuncu/takım arama çubuğunu ve arama önerisi listesinin görünümünü düzenler.
 const styles = StyleSheet.create({
   container: {
     position: "relative",
@@ -106,15 +111,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 8,
-    fontSize: 15,
+    fontSize: 16,
     borderWidth: 1,
-    borderColor: "#b8cadc",
+    borderColor: "#86efac",
   },
   suggestionsContainer: {
     backgroundColor: "white",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d9e1ea",
+    borderColor: "#d1fae5",
     marginTop: 6,
     zIndex: 1001,
     elevation: 5,
@@ -127,7 +132,7 @@ const styles = StyleSheet.create({
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#edf1f5",
+    borderBottomColor: "#e5f3ea",
   },
   suggestionContent: {
     flexDirection: "row",
@@ -136,13 +141,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   suggestionText: {
-    color: "#12263a",
-    fontSize: 15,
-    fontWeight: "800",
+    color: "#143524",
+    fontSize: 16,
+    fontWeight: "900",
   },
   suggestionSubtext: {
-    color: "#66788a",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#5f6f64",
+    fontSize: 13,
+    fontWeight: "800",
   },
 });

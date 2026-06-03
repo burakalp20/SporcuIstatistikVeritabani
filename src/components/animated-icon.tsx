@@ -95,6 +95,8 @@ export function AnimatedIcon() {
   );
 }
 
+// UI'ın hazırlanmasında Codex kullanılmıştır.
+// Animasyonlu ikon arka planını ve ikonun yerleşim/gölge görünümünü düzenler.
 const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',
@@ -119,14 +121,14 @@ const styles = StyleSheet.create({
   },
   background: {
     borderRadius: 40,
-    experimental_backgroundImage: `linear-gradient(180deg, #3C9FFE, #0274DF)`,
+    experimental_backgroundImage: `linear-gradient(180deg, #22c55e, #15803d)`,
     width: 128,
     height: 128,
     position: 'absolute',
   },
   backgroundSolidColor: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#208AEF',
+    backgroundColor: '#16a34a',
     zIndex: 1000,
   },
 });

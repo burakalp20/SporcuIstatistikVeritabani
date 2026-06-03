@@ -10,7 +10,7 @@ export default function RankingLayout() {
         headerTitle: "",
         headerBackTitle: "",
         headerBackVisible: true,
-        headerTintColor: "#0b5cab",
+        headerTintColor: "#15803d",
       }}
     >
       <Stack.Screen
@@ -19,7 +19,7 @@ export default function RankingLayout() {
           title: "",
           headerTitle: "",
           headerBackTitle: "",
-          headerTintColor: "#0b5cab",
+          headerTintColor: "#15803d",
         }}
       />
     </Stack>
