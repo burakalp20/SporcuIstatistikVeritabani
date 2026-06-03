@@ -112,4 +112,3 @@ Proje geliştirme sürecinde ilişkisel veritabanı yönetimi, frontend-backend 
     [10] OpenAI Codex (Kod geliştirme ve hata analizi desteği)
     https://openai.com/
 
->>>>>>> e9e7b333023f881f5afff1afd3239706bb4a37ab
