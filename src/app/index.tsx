@@ -20,7 +20,7 @@ export default function Home() {
   useEffect(() => {
     let active = true;
 
-    // Ilk acilista ligleri backendden alir ve gelen ilk ligi varsayilan secim yapar.
+    // İlk açılışta ligleri backendden alir ve gelen ilk ligi varsayılan seçim yapar.
     getLeagues()
       .then((items) => {
         if (!active) {
@@ -52,7 +52,7 @@ export default function Home() {
     setLoading(true);
     setError("");
 
-    // Secilen lig degistikce oyuncu listesi SQL verisine gore yeniden yuklenir.
+    // Seçilen lig değiştiğinde oyuncu listesi SQL verisine göre yeniden yükleyen kısım.
     getPlayers(league)
       .then((items) => {
         if (active) {
@@ -125,7 +125,7 @@ export default function Home() {
 
       <View style={styles.gridRow}>
         <View style={styles.gridColumn}>
-          {/* Lig degistiginde kart tamamen yenilensin; eski liste satirlari karismasin. */}
+          {/* Lig değiştiğinde  tamamen yenileniyo eski liste satırların karışmasını engelliyor. */}
           <RankingCard
             key={`${league}-goals`}
             title="Gol Krallığı"
@@ -170,7 +170,7 @@ export default function Home() {
 }
 
 // UI'ın hazırlanmasında Codex kullanılmıştır.
-// Ana sayfanın başlık paneli, arama alanı, lig araç çubuğu ve krallık kart yerleşimlerini düzenler.
+// Ana sayfanın başlık paneli, arama alanı, lig araç çubuğu ve krallık kart yerleşimlerini düzenleyen kod.
 const styles = StyleSheet.create({
   page: {
     flex: 1,

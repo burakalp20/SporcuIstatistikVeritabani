@@ -1,9 +1,9 @@
 export type RankingKey = "goals" | "assists" | "yellowCards" | "redCards";
 
-// Backend SQL verisini bu tipe cevirir; ekranlar artik mockData yerine bu modeli kullanir.
+// Backend SQL verisini bu tipe çevirir  ekranlar artık mockData yerine bu modeli kullanır.
 export type Player = {
-  // Liste elemanlarini React icin benzersiz tutar. Ayni oyuncunun birden fazla
-  // sezon/istatistik satiri oldugunda sadece id kullanmak yeterli olmayabilir.
+  // Liste elemanlarını React için benzersiz tutar. Aynı oyuncunun birden fazla
+  // sezon/istatistik satırı olduğunda sadece id kullanmak yeterli olmayabilir.
   rowKey?: string;
   id: number;
   name: string;
@@ -24,7 +24,7 @@ export type Player = {
   };
 };
 
-// Arama kutusu hem oyuncu hem takim sonucu gosterdigi icin iki farkli sonuc tipi tutulur.
+// Arama kutusu hem oyuncu hem takim sonucu gosterdiği için iki farkli sonuç tipi tutulur.
 export type SearchResult =
   | {
       id: number;
@@ -45,14 +45,14 @@ export type SearchResult =
 // Genel arama sonucundan sadece oyuncu tipini ayırmak için kullanılır.
 export type PlayerSearchResult = Extract<SearchResult, { type: "player" }>;
 
-// Yeni oyuncu formunda lig seçildiğinde doldurulacak lig bilgilerini temsil eder.
+// Yeni oyuncu formunda lig seçildiğinde doldurulacak lig bilgilerini burada temsil eder.
 export type LeagueOption = {
   id: number;
   name: string;
   country: string;
 };
 
-// Yeni oyuncu formunda takım seçildiğinde otomatik doldurulacak takım bilgilerini temsil eder.
+// Yeni oyuncu formunda takım seçildiğinde otomatik doldurulacak takım bilgilerini burada temsil eder.
 export type TeamOption = {
   id: number;
   name: string;
@@ -62,7 +62,7 @@ export type TeamOption = {
   leagueCountry: string;
 };
 
-// Yeni oyuncu ekleme formunun backend'e göndereceği tüm alanları tanımlar.
+// Yeni oyuncu ekleme formunun backend'e göndereceği tüm alanları burada tanımlar.
 export type NewPlayerInput = {
   name: string;
   surname: string;

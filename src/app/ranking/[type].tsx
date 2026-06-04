@@ -29,7 +29,7 @@ export default function RankingScreen() {
   const { type, league } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
-  // type parametresi hangi kralligin acildigini belirler: gol, asist veya kartlar.
+  // type parametresi hangi krallığın açıldığını burada belirler: gol, asist veya kartlar.
   const rankingType = normalizeRankingType(type);
   const selectedLeague = Array.isArray(league) ? league[0] || "" : league || "";
   const [players, setPlayers] = useState<Player[]>([]);
@@ -49,7 +49,7 @@ export default function RankingScreen() {
     setLoading(true);
     setError("");
 
-    // Sadece secilen krallik ve lig icin sirali oyuncu listesi backendden alinir.
+    // Sadece seçilen krallık ve lig için sıralı oyuncu listesi backendden buradan alınır.
     getRanking(rankingType, selectedLeague || undefined)
       .then((items) => {
         if (active) {

@@ -29,7 +29,7 @@ export default function CompareScreen() {
     });
   }, [navigation]);
 
-  // URL'deki iki oyuncu id'sine göre karşılaştırılacak oyuncu detaylarını yükler.
+  // Karşılaştırılan oyuncuların detaylarını burada yüklenir
   useEffect(() => {
     let active = true;
     const firstId = Number(Array.isArray(player1) ? player1[0] : player1);
@@ -150,7 +150,7 @@ export default function CompareScreen() {
   );
 }
 
-// Karşılaştırılan oyuncunun profil özet kartını oluşturur.
+// Karşılaştırılan oyuncunun profil özeti burada oluşturur.
 function PlayerCard({ player }: { player: Player }) {
   return (
     <View style={styles.playerCard}>
@@ -175,7 +175,7 @@ function PlayerCard({ player }: { player: Player }) {
 }
 
 // UI'ın hazırlanmasında Codex kullanılmıştır.
-// Oyuncu karşılaştırma sayfasındaki profil kartlarını, istatistik tablolarını ve yeşil tema renklerini düzenler.
+// Oyuncu karşılaştırma sayfasındaki profilleri, istatistik tablolarını ve yeşil tema renklerine çevirir.
 const styles = StyleSheet.create({
   page: {
     flex: 1,

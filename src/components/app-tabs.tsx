@@ -8,7 +8,6 @@ export default function AppTabs() {
   const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
 
   return (
-    // NativeTabs mobilde sadece ana sayfa sekmesini gosterir; kullanilmayan explore sekmesi kaldirildi.
     <NativeTabs
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}

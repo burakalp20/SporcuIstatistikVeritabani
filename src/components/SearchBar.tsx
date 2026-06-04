@@ -15,7 +15,7 @@ import type { SearchResult } from "../types/player";
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
-  // Hizli yazarken eski API cevabi yeni arama sonucunun ustune yazmasin diye sayac tutulur.
+  // Hızlı yazarken eski API cevabı yeni arama sonucunun üstüne yazmasın diye sayac tutulur.
   const searchId = useRef(0);
   const router = useRouter();
 
@@ -49,7 +49,7 @@ export default function SearchBar() {
     setQuery("");
     setSuggestions([]);
 
-    // Oyuncu secilirse profil sayfasina, takim secilirse takim kadrosuna gidilir.
+    // Oyuncu seçilirse profil sayfasına, takım seçilirse takim kadrosuna gidilir.
     if (item.type === "player") {
       router.push(`/player/${item.id}` as any);
       return;

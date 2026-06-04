@@ -78,7 +78,7 @@ export default function PlayerCompareBar() {
     );
   };
 
-  // İki oyuncu seçildiyse karşılaştırma sayfasına gerekli id'lerle gider.
+  // İki oyuncu seçildiyse karşılaştırma sayfasına gerekli id'lere buradan gidilir.
   const comparePlayers = () => {
     if (selectedPlayers.length !== 2) {
       return;

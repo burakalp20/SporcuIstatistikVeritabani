@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 
 export default function Layout() {
   return (
-    // Ana sayfada baslik gizli, detay sayfalarinda geri butonu gorunur olacak sekilde rota yapisi tanimlanir.
+    // Uygulama içerisindeki ekran geçişleri ve navigasyon ayarlarını tanımlayan kod.
     <Stack
       screenOptions={{
         headerShown: false,
@@ -10,7 +10,7 @@ export default function Layout() {
       }}
       >
       <Stack.Screen name="index" />
-      {/* Yeni oyuncu ekleme sayfası üst başlık ve geri butonu ile açılır. */}
+      {/* Yeni oyuncu ekleme sayfasını üst başlık ve geri dönüş butonu ile açan kod. */}
       <Stack.Screen
         name="add-player"
         options={{
@@ -20,7 +20,7 @@ export default function Layout() {
           title: "Yeni Oyuncu Ekle",
         }}
       />
-      {/* Oyuncu karşılaştırma sayfası seçilen iki oyuncuyu ayrı bir ekranda gösterir. */}
+      {/* İki oyuncunun istatistiklerini karşılaştırmalı olarak gösteren ekranı oluşturan kod. */}
       <Stack.Screen
         name="compare"
         options={{
@@ -31,7 +31,7 @@ export default function Layout() {
         }}
       />
       <Stack.Screen name="ranking" />
-      {/* Oyuncu detay sayfası dinamik id parametresiyle ilgili oyuncuyu açar. */}
+      {/* Seçilen oyuncunun detay bilgilerini dinamik ID parametresine göre görüntüleyen kod. */}
       <Stack.Screen
         name="player/[id]"
         options={{
@@ -41,7 +41,7 @@ export default function Layout() {
           title: "",
         }}
       />
-      {/* Takım detay sayfası URL'deki takım adına göre kadro listesini açar. */}
+      {/* Seçilen takımın kadro ve istatistik bilgilerini listeleyen detay sayfası kodu. */}
       <Stack.Screen
         name="team/[name]"
         options={{

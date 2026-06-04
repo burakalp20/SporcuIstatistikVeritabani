@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 
 export default function RankingLayout() {
   return (
-    // Krallik sayfalari kendi stack yapisini kullanir; geri butonu acik, baslik metni bostur.
+    // Krallık sayfaları kendi stack yapısını kullanır; geri butonu açık, başlık metni boştur.
     <Stack
       screenOptions={{
         headerShown: true,

@@ -9,7 +9,6 @@ import type {
 } from "../types/player";
 
 // Expo uygulamasi tum veriyi Node.js backendinden alir.
-// Telefonda test ederken bu adres .env ile bilgisayarin yerel IP'sine cevrilebilir.
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3001";
 
 function buildUrl(path: string, params: Record<string, string | undefined> = {}) {
@@ -40,37 +39,37 @@ export function getLeagues() {
   return fetchJson<string[]>(buildUrl("/leagues"));
 }
 
-// Yeni oyuncu formundaki lig araması için SQL'deki lig kayıtlarını getirir.
+// Yeni oyuncu formundaki lig araması için SQL'deki lig kayıtları burada getirir.
 export function searchLeagueOptions(query: string) {
   return fetchJson<LeagueOption[]>(buildUrl("/league-options", { q: query }));
 }
 
-// Yeni oyuncu formundaki takım araması için SQL'deki takım kayıtlarını getirir.
+// Yeni oyuncu formundaki takım araması için SQL'deki takım kayıtları burada getirir.
 export function searchTeamOptions(query: string) {
   return fetchJson<TeamOption[]>(buildUrl("/team-options", { q: query }));
 }
 
-// Ana sayfada seçilen lige göre oyuncu istatistiklerini listeler.
+// Ana sayfada seçilen lige göre oyuncu istatistikleri burada listelenir.
 export function getPlayers(league?: string) {
   return fetchJson<Player[]>(buildUrl("/players", { league }));
 }
 
-// Oyuncu profil sayfası için tek bir oyuncunun detay bilgisini getirir.
+// Oyuncu profil sayfası için tek bir oyuncunun detay bilgisi burada getirir.
 export function getPlayer(id: number) {
   return fetchJson<Player>(buildUrl(`/players/${id}`));
 }
 
-// Takım sayfasında gösterilecek kadro listesini takım adına göre getirir.
+// Takım sayfasında gösterilecek kadro listesini takım adına göre burada getirir.
 export function getTeamPlayers(teamName: string) {
   return fetchJson<Player[]>(buildUrl(`/teams/${encodeURIComponent(teamName)}`));
 }
 
-// Krallık sayfaları için gol, asist veya kart sıralamasını getirir.
+// Krallık sayfaları için gol, asist veya kart sıralamasını buradagetirir.
 export function getRanking(type: RankingKey, league?: string) {
   return fetchJson<Player[]>(buildUrl(`/rankings/${type}`, { league }));
 }
 
-// Yeni oyuncu ekleme formundaki bilgileri backend'e gönderip SQL'e kaydeder.
+// Yeni oyuncu ekleme formundaki bilgileri backend'e gönderip SQL'e burada kaydeder.
 export async function createPlayer(player: NewPlayerInput) {
   const response = await fetch(buildUrl("/players"), {
     method: "POST",
@@ -88,7 +87,7 @@ export async function createPlayer(player: NewPlayerInput) {
   return response.json() as Promise<{ id: number }>;
 }
 
-// Oyuncu profilindeki silme işlemini backend'e bildirir.
+// Oyuncu profilindeki silme işlemini backend'e bu kod bildirir.
 export async function deletePlayer(id: number) {
   const response = await fetch(buildUrl(`/players/${id}`), {
     method: "DELETE",
@@ -115,8 +114,7 @@ export async function searchPlayersAndTeams(query: string) {
     teams: string[];
   }>(buildUrl("/search", { q: query }));
 
-  // Backend oyuncu ve takimlari ayri dondurur; arama kutusu tek liste gosterdigi
-  // icin burada ortak SearchResult formatina cevrilir.
+  // Backend oyuncu ve takimlari ayrı dondurur arama kutusu tek liste gösterdiği için burada ortak SearchResult formatına çevrilir.
   return [
     ...result.players.map<SearchResult>((player) => ({
       ...player,
@@ -132,7 +130,7 @@ export async function searchPlayersAndTeams(query: string) {
   ];
 }
 
-// Oyuncu karşılaştırma paneli sadece oyuncu seçebildiği için takım sonuçlarını filtreler.
+// Oyuncu karşılaştırma paneli sadece oyuncu seçebildiği için takım sonuçlarını burada filtreler.
 export async function searchPlayers(query: string): Promise<PlayerSearchResult[]> {
   const results = await searchPlayersAndTeams(query);
 

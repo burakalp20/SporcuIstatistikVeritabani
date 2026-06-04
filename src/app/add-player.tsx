@@ -66,7 +66,7 @@ export default function AddPlayerScreen() {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
-  // Lig alanına yazıldıkça SQL'deki lig seçeneklerini arar.
+  // Lig alanına yazıldıkça SQL'deki lig seçeneklerini arayan kod.
   const handleLeagueSearch = async (text: string) => {
     updateField("league", text);
     leagueSearchId.current += 1;
@@ -90,7 +90,7 @@ export default function AddPlayerScreen() {
     }
   };
 
-  // Lig seçildiğinde lig adı ve ülke bilgisini forma yerleştirir.
+  // Lig seçildiğinde lig adı ve ülke bilgisini yerleştirir.
   const selectLeague = (league: LeagueOption) => {
     setForm((current) => ({
       ...current,
@@ -408,7 +408,7 @@ function SearchInput<T extends { id: number }>({
 }
 
 // UI'ın hazırlanmasında Codex kullanılmıştır.
-// Yeni oyuncu ekleme formunun bölümlerini, inputlarını, arama önerilerini ve kayıt butonunu düzenler.
+// Yeni oyuncu ekleme formunun bölümlerini, inputlarını, arama önerilerini ve kayıt butonunu düzenleyen kod.
 const styles = StyleSheet.create({
   page: {
     flex: 1,

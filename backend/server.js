@@ -15,8 +15,8 @@ const dbDatabase = process.env.DB_DATABASE || "SporcuIstatistikVeritabani";
 const dbDriver = process.env.DB_ODBC_DRIVER || "ODBC Driver 18 for SQL Server";
 const shouldTrustCertificate = process.env.DB_TRUST_SERVER_CERTIFICATE !== "false";
 
-// Windows Authentication kullanildigi icin kullanici adi/sifre yerine
-// calisan Windows kullanicisinin SQL Server yetkisi kullanilir.
+// Windows Authentication kullanıdığı için kullanıcı adi/sifre yerine çalışan Windows kullanıcısının SQL Server yetkisi kullanilir. 
+// Bu kod Codex yardımıyla yazılmıştır.
 const dbConfig = {
   connectionString: [
     `Driver={${dbDriver}}`,
@@ -33,7 +33,7 @@ const dbConfig = {
 let poolPromise;
 
 function getPool() {
-  // Her istekte yeni SQL baglantisi acmamak icin tek bir connection pool tekrar kullanilir.
+  // Her istekte yeni SQL bağlantısı açmamak için tek bir connection pool tekrar kullanılır.
   if (!poolPromise) {
     poolPromise = sql.connect(dbConfig);
   }
@@ -42,10 +42,10 @@ function getPool() {
 }
 
 function mapPlayer(row) {
-  // SQL'deki Turkce kolon adlari uygulamanin bekledigi Player formatina cevrilir.
+  // SQL'deki Türkçe kısımları uygulamanın beklediği Player formatına burada çevrilir.
   return {
-    // Ayni oyuncu bazi liglerde birden fazla istatistik satirina sahip olabilir.
-    // React listelerinde key cakismamasi icin istatistik satiri da anahtara eklenir.
+    // Aynı oyuncu bazı liglerde birden fazla istatistik satırına sahip olabilir.
+    // React listelerinde key çakışmaması için istatistik satırı da anahtara eklenir.
     rowKey: `${row.statId}-${row.id}-${row.teamId}-${row.leagueId}`,
     id: row.id,
     name: row.name,
@@ -67,8 +67,8 @@ function mapPlayer(row) {
   };
 }
 
-// Oyuncu, takim, lig, sezon istatistigi ve kulup kariyeri tek sorguda birlestirilir.
-// Boylece frontend tarafinda mockData yerine dogrudan iliskisel SQL verisi kullanilir.
+// Oyuncu, takim, lig, sezon istatistiği ve kulup kariyeri tek sorguda birleştirilir.
+// Böylece frontend tarafında mockData yerine doğrudan ilişkisel SQL verisi kullanılır.
 const playersSelect = `
   SELECT
     si.id AS statId,
@@ -101,8 +101,8 @@ const playersSelect = `
   ) kk
 `;
 
-// Siralama kolonu kullanicidan geldiginde dogrudan SQL'e yazilmaz.
-// Sadece bu listede izin verilen kolonlar kullanilir.
+// Sıralama kolonu kullanıcıdan geldiğinde doğrudan SQL'e yazılmaz.
+// Sadece bu listede izin verilen kolonlar kullanılır.
 const rankingColumns = {
   goals: "si.gol",
   assists: "si.asist",
@@ -115,7 +115,7 @@ function cleanText(value) {
   return String(value || "").trim();
 }
 
-// Arama yaparken Türkçe karakter farklarını azaltmak için metni sadeleştirir.
+// Türkçe aramalarda hataları engeller.
 function normalizeSearchText(value) {
   return cleanText(value)
     .toLocaleLowerCase("tr-TR")
@@ -128,6 +128,7 @@ function normalizeSearchText(value) {
 }
 
 // SQL tarafında da Türkçe karakterleri sadeleştirerek LIKE aramasını güçlendirir.
+// Bu kod Codex yardımıyla yazılmıştır.
 function normalizedSql(column) {
   return `
     LOWER(
@@ -223,7 +224,7 @@ async function findOrCreateTeam(transaction, teamName, city, foundedYear, league
   return insertResult.recordset[0].id;
 }
 
-// Backend ve SQL Server bağlantısının çalışıp çalışmadığını kontrol eder.
+// Backend ve SQL Server bağlantısının çalışıp çalışmadığını kontrol eden kısım.
 app.get("/health", async (_req, res) => {
   try {
     const pool = await getPool();
@@ -234,7 +235,7 @@ app.get("/health", async (_req, res) => {
   }
 });
 
-// Ana sayfadaki lig butonları için tüm lig adlarını getirir.
+// Ana sayfadaki lig butonları için tüm lig adlarını getiren kod.
 app.get("/leagues", async (_req, res) => {
   try {
     const pool = await getPool();
@@ -248,7 +249,7 @@ app.get("/leagues", async (_req, res) => {
   }
 });
 
-// Yeni oyuncu formundaki lig arama alanı için lig seçeneklerini getirir.
+// Yeni oyuncu ekleme formundaki lig arama alanında görüntülenecek lig listesini getiren kod
 app.get("/league-options", async (req, res) => {
   try {
     const query = cleanText(req.query.q);
@@ -284,7 +285,7 @@ app.get("/league-options", async (req, res) => {
   }
 });
 
-// Yeni oyuncu formundaki takım arama alanı için takım ve bağlı lig bilgilerini getirir.
+// Yeni oyuncu formundaki takım arama alanı için takım ve bağlı lig bilgilerini getiren kod.
 app.get("/team-options", async (req, res) => {
   try {
     const query = cleanText(req.query.q);
@@ -326,7 +327,7 @@ app.get("/team-options", async (req, res) => {
   }
 });
 
-// Ana sayfa ve lig seçimi için oyuncuları isteğe bağlı lig filtresiyle getirir.
+// Ana sayfa ve lig seçimi ekranında oyuncuları lig filtresine göre getirir.
 app.get("/players", async (req, res) => {
   try {
     const pool = await getPool();
@@ -334,7 +335,8 @@ app.get("/players", async (req, res) => {
     const where = [];
 
     if (req.query.league) {
-      // Lig filtresi parametreli verilir; boylece sorgu degeri SQL'e guvenli aktarilir.
+      // Lig filtresi parametreli verilir, böylece sorgu degeri SQL'e güvenli aktarılrı.
+      // Bu kod Codex yardımıyla yazılmıştır.
       request.input("league", sql.NVarChar, req.query.league);
       where.push("l.ad = @league");
     }
@@ -468,7 +470,7 @@ app.post("/players", async (req, res) => {
   }
 });
 
-// Oyuncuyu bağlı istatistik ve kariyer kayıtlarıyla birlikte veritabanından tamamen siler.
+// Oyuncuyu bağlı istatistik ve kariyer kayıtlarıyla birlikte veritabanından tamamen silen kısım
 app.delete("/players/:id", async (req, res) => {
   const playerId = Number(req.params.id);
 
@@ -516,14 +518,14 @@ app.delete("/players/:id", async (req, res) => {
     try {
       await transaction.rollback();
     } catch {
-      // Rollback hatasi ana hatayi golgelemesin.
+      // Rollback sırasında hata çıkarsa ana hatanın önüne geçmesini engelleyen kod
     }
 
     res.status(500).json({ error: error.message });
   }
 });
 
-// Takım kadrosu sayfası için seçilen takımın oyuncularını listeler.
+// Takım kadrosu sayfası için seçilen takımın oyuncularını listeleyen kod.
 app.get("/teams/:name", async (req, res) => {
   try {
     const pool = await getPool();
@@ -580,7 +582,7 @@ app.get("/search", async (req, res) => {
     }
 
     const pool = await getPool();
-    // LIKE aramasi hem oyuncu ad-soyadinda hem de takim adinda kullanilir.
+    // LIKE aramasi hem oyuncu ad-soyadinda hem de takim adına kullanılır.
     const likeQuery = `%${query}%`;
 
     const playersResult = await pool

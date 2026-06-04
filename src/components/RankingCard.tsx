@@ -11,7 +11,7 @@ type Props = {
 };
 
 function getPlayerKey(item: Player, index: number, valueKey: RankingKey) {
-  // Backend rowKey dondururse onu kullaniriz; yoksa liste icin yedek benzersiz key uretiriz.
+  // Backend rowKey döndürürsa onu burada kullanırız, yoksa liste için yedek benzersiz key burada üretilir.
   return (
     item.rowKey ||
     `${valueKey}-${item.id}-${item.team}-${item.league}-${item.season}-${index}`
@@ -26,14 +26,14 @@ export default function RankingCard({
 }: Props) {
   const router = useRouter();
 
-  // Kartlar ana sayfada sadece ilk 5 sirayi gosterdigi icin veri burada kisaltilir.
+  // Kartlar ana sayfada sadece ilk 5 sırayı gösterdiği icin veri burada kısaltılır.
   const sorted = [...data]
     .sort((a, b) => Number(b[valueKey] ?? 0) - Number(a[valueKey] ?? 0))
     .slice(0, 5);
 
   // Kart başlığına basıldığında ilgili krallığın detay sayfasını açar.
   const goToRanking = () => {
-    // "Tumunu Gor" tiklandiginda secili lig query parametresiyle siralama sayfasina tasinir.
+    // "Tumunu Gor" tiklandiginda secili lig query parametresiyle siralama sayfasina burada tasinir.
     router.push(`/ranking/${valueKey}?league=${selectedLeague || ""}`);
   };
 
@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   list: {
-    // Sabit yukseklik, lig degisimlerinde satirlarin baslik ustune tasmasini engeller.
     height: 280,
     overflow: "hidden",
   },

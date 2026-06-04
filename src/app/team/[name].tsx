@@ -9,7 +9,7 @@ export default function TeamScreen() {
   const { name } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
-  // Takim adi URL'de encode edildigi icin ekranda kullanmadan once geri cevrilir.
+  // Takım adı URL'de encode edildiği çin ekranda kullanmadan önce burada geri çevrilir.
   const teamName = decodeURIComponent(name as string);
   const [teamPlayers, setTeamPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,6 +95,7 @@ export default function TeamScreen() {
         <FlatList
           style={styles.playersList}
           data={teamPlayers}
+          //Bu kod Codex yardımıyla yazılmıştır
           // rowKey SQL istatistik satirini da icerir; ayni oyuncu id'si tekrar etse bile liste bozulmaz.
           keyExtractor={(item, index) =>
             item.rowKey ||

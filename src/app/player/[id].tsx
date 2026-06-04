@@ -13,7 +13,7 @@ import { deletePlayer, getPlayer } from "../../services/api";
 import type { Player } from "../../types/player";
 
 export default function PlayerScreen() {
-  // URL'deki /player/[id] parametresi hangi oyuncunun detayinin acilacagini belirler.
+  // URL'deki /player/[id] parametresi hangi oyuncunun detaının açılacağını belirler.
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function PlayerScreen() {
     }
   }, [navigation, player]);
 
-  // Onay penceresinde "Sil" seçildiğinde oyuncuyu veritabanından kaldırır.
+  // Onay penceresinde "Sil" seçildiğinde oyuncuyu veritabanından kaldıran kod.
   const confirmDelete = async () => {
     setDeleting(true);
     setError("");
